@@ -1,4 +1,5 @@
-﻿using QuadraticOptimizationApi.Converters;
+﻿using Accord.Math;
+using QuadraticOptimizationApi.Converters;
 using QuadraticOptimizationApi.RequestModels;
 using QuadraticOptimizationApi.ResponseModels;
 using QuadraticOptimizationApi.Services.Interfaces;
@@ -11,7 +12,9 @@ namespace QuadraticOptimizationApi.Services.Classes
     {
         #region Fields
 
-        BalanceSolver _solver;
+        private BalanceSolver _solver;
+
+        private const double accuracy = 0.1E-14;
 
         #endregion
 
@@ -36,13 +39,32 @@ namespace QuadraticOptimizationApi.Services.Classes
                 BalancedFlows = request.Flows
                 .Select((f, i) => new BalancedFlow { Name = f.Name, Value = result[i] })
                 .ToList(),
-                IsBalanced = true
+                IsBalanced = CheckBalaced(dataModel.MatrixA, result)
             };
 
             return response;
         }
 
         #endregion
-        
+
+        #region Private Methods
+
+        private bool CheckBalaced(double[,] A, double[] balancedFlows)
+        {
+            bool isBalanced = false;
+            double[] result = A.Dot(balancedFlows);
+
+            foreach (double x in result)
+            {
+                isBalanced = x <= accuracy;
+
+                if (isBalanced is false)
+                    return false;
+            }
+
+            return isBalanced;
+        }
+
+        #endregion
     }
 }
