@@ -29,7 +29,7 @@ namespace QuadraticOptimizationApi.Converters
             };
         }
 
-        private static double[,] BuildBalanceMatrix(List<NodeDto> nodes, List<string> flowNames)
+        public static double[,] BuildBalanceMatrix(List<NodeDto> nodes, List<string> flowNames)
         {
             int rows = nodes.Count;
             int cols = flowNames.Count;
@@ -59,7 +59,7 @@ namespace QuadraticOptimizationApi.Converters
             return matrixA;
         }
 
-        private static void AddConstraints(ref double[,] matrixA, List<ConstraintDto> constraints, List<string> flowNames)
+        public static void AddConstraints(ref double[,] matrixA, List<ConstraintDto> constraints, List<string> flowNames)
         {
             if (constraints == null || constraints.Count == 0)
                 return;
