@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.13.35818.85 d17.13
+VisualStudioVersion = 17.13.35818.85
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuadraticOptimizationApi", "QuadraticOptimizationApi.csproj", "{16117BAB-C168-43AF-BA17-2DF68A03F581}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiTests", "..\ApiTests\ApiTests.csproj", "{1450CD1F-A049-4CB0-890A-0C43231E416F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{16117BAB-C168-43AF-BA17-2DF68A03F581}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{16117BAB-C168-43AF-BA17-2DF68A03F581}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{16117BAB-C168-43AF-BA17-2DF68A03F581}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1450CD1F-A049-4CB0-890A-0C43231E416F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1450CD1F-A049-4CB0-890A-0C43231E416F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1450CD1F-A049-4CB0-890A-0C43231E416F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1450CD1F-A049-4CB0-890A-0C43231E416F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
