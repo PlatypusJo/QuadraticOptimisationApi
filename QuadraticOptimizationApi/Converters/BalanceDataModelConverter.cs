@@ -15,7 +15,7 @@ namespace QuadraticOptimizationApi.Converters
             // 2. Вектор допусков (Tolerance) и начальных значений (X0)
             var tolerance = request.Flows.Select(f => f.Tolerance).ToArray();
             var x0 = request.Flows.Select(f => f.MeasuredValue).ToArray();
-            FlowDto[] flows = [];
+            FlowDto[] flows = new FlowDto[request.Flows.Count];
             request.Flows.ToArray().CopyTo(flows, 0);
 
             // 3. Добавляем ограничения (Constraints) в матрицу A

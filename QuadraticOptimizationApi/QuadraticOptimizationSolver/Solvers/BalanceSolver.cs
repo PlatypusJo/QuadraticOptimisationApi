@@ -102,10 +102,8 @@ namespace QuadraticOptimizationSolver.Solvers
             int n = flows.Length;
             for (int i = 0; i < flows.Length; i++)
             {
-                if (flows[i].IsMeasured)
-                    AddRangeConstraint(ref constraints, flows[i].MetrologicRange, n, i);
-                else
-                    AddRangeConstraint(ref constraints, flows[i].TechnologicRange, n, i);
+                RangeDto range = flows[i].IsMeasured ? flows[i].MetrologicRange : flows[i].TechnologicRange;
+                AddRangeConstraint(ref constraints, range, n, i);
             }
         }
 
