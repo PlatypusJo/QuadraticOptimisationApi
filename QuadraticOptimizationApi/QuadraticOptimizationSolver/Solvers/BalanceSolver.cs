@@ -1,7 +1,10 @@
-﻿using Accord.Math.Optimization;
+﻿using Accord.Math;
+using Accord.Math.Optimization;
 using MathNet.Numerics.LinearAlgebra;
+using QuadraticOptimizationApi.DTOs;
 using QuadraticOptimizationSolver.DataModels;
 using QuadraticOptimizationSolver.Interfaces;
+using System;
 
 namespace QuadraticOptimizationSolver.Solvers
 {
@@ -15,7 +18,7 @@ namespace QuadraticOptimizationSolver.Solvers
             var w = GetMatrixW(data.Tolerance);
             var h = GetMatrixH(w, i);
             var d = GetVectorD(h, data.VectorX0);
-            return FindMinimum(h, d, data.MatrixA, data.VectorY);
+            return FindMinimum(h, d, data.MatrixA, data.VectorY, data.Flows);
         }
 
         #endregion
@@ -62,11 +65,69 @@ namespace QuadraticOptimizationSolver.Solvers
             return h.Multiply(x0).Multiply(-1).ToArray();
         }
 
-        private double[] FindMinimum(double[,] matrixH, double[] vectorD, double[,] matrixA, double[] vectorY)
+        private double[] FindMinimum(double[,] matrixH, double[] vectorD, double[,] matrixA, double[] vectorY, FlowDto[] flows)
         {
-            GoldfarbIdnani solver = new GoldfarbIdnani(matrixH, vectorD, matrixA, vectorY, matrixA.GetLength(0));
-            solver.Minimize();
+            var constraints = new List<LinearConstraint>();
+            int n = flows.Length;
+
+            AddBalancingConstraints(ref constraints, matrixA, vectorY, n);
+            AddRangeConstraints(ref constraints, flows);
+
+            var solver = new GoldfarbIdnani(
+                function: new QuadraticObjectiveFunction(matrixH, vectorD),
+                constraints: constraints);
+
+            if (!solver.Minimize())
+                throw new Exception("Не удалось найти решение. Проверьте ограничения.");
+
             return solver.Solution;
+        }
+
+        private void AddBalancingConstraints(ref List<LinearConstraint> constraints, double[,] matrixA, double[] vectorY, int flowsNumber)
+        {
+            for (int i = 0; i < matrixA.GetLength(0); i++)
+            {
+                var coefficients = matrixA.GetRow(i);
+                constraints.Add(new LinearConstraint(numberOfVariables: flowsNumber)
+                {
+                    CombinedAs = coefficients,
+                    ShouldBe = ConstraintType.EqualTo,
+                    Value = vectorY[i]
+                });
+            }
+        }
+
+        private void AddRangeConstraints(ref List<LinearConstraint> constraints, FlowDto[] flows)
+        {
+            int n = flows.Length;
+            for (int i = 0; i < flows.Length; i++)
+            {
+                if (flows[i].IsMeasured)
+                    AddRangeConstraint(ref constraints, flows[i].MetrologicRange, n, i);
+                else
+                    AddRangeConstraint(ref constraints, flows[i].TechnologicRange, n, i);
+            }
+        }
+
+        private void AddRangeConstraint(ref List<LinearConstraint> constraints, RangeDto range, int flowsNumber, int index)
+        {
+            var lowerCoeff = new double[flowsNumber];
+            lowerCoeff[index] = 1;
+            constraints.Add(new LinearConstraint(flowsNumber)
+            {
+                CombinedAs = lowerCoeff,
+                ShouldBe = ConstraintType.GreaterThanOrEqualTo,
+                Value = range.Min
+            });
+
+            var upperCoeff = new double[flowsNumber];
+            upperCoeff[index] = 1;
+            constraints.Add(new LinearConstraint(flowsNumber)
+            {
+                CombinedAs = upperCoeff,
+                ShouldBe = ConstraintType.LesserThanOrEqualTo,
+                Value = range.Max
+            });
         }
 
         #endregion

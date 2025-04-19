@@ -15,6 +15,8 @@ namespace QuadraticOptimizationApi.Converters
             // 2. Вектор допусков (Tolerance) и начальных значений (X0)
             var tolerance = request.Flows.Select(f => f.Tolerance).ToArray();
             var x0 = request.Flows.Select(f => f.MeasuredValue).ToArray();
+            FlowDto[] flows = [];
+            request.Flows.ToArray().CopyTo(flows, 0);
 
             // 3. Добавляем ограничения (Constraints) в матрицу A
             AddConstraints(ref matrixA, request.Constraints, flowNames);
@@ -25,7 +27,8 @@ namespace QuadraticOptimizationApi.Converters
                 VectorY = new double[matrixA.GetLength(0)], // Все нули (A*x = 0)
                 Tolerance = tolerance,
                 VectorI = Enumerable.Repeat(1.0, flowNames.Count).ToArray(),
-                VectorX0 = x0
+                VectorX0 = x0,
+                Flows = flows
             };
         }
 

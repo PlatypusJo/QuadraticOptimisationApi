@@ -1,4 +1,5 @@
-﻿using System;
+﻿using QuadraticOptimizationApi.DTOs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,6 +16,7 @@ namespace QuadraticOptimizationSolver.DataModels
         public double[] Tolerance { get; set; }
         public double[] VectorI { get; set; }
         public double[] VectorX0 { get; set; }
+        public FlowDto[] Flows { get; set; }
 
         #endregion
 
