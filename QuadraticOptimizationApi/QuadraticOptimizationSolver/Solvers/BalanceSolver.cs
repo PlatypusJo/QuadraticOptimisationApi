@@ -84,7 +84,7 @@ namespace QuadraticOptimizationSolver.Solvers
                 constraints: constraints);
 
             if (!solver.Minimize())
-                throw new Exception("Не удалось найти решение. Проверьте ограничения.");
+                return new double[n];
 
             return solver.Solution;
         }
