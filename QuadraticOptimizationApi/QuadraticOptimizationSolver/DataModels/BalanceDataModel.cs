@@ -16,7 +16,8 @@ namespace QuadraticOptimizationSolver.DataModels
         public double[] Tolerance { get; set; }
         public double[] VectorI { get; set; }
         public double[] VectorX0 { get; set; }
-        public FlowDto[] Flows { get; set; }
+        public (RangeDto metrologicRange, RangeDto technologicRange)[] FlowRanges { get; set; }
+        public bool[] FlowMeasured { get; set; }
 
         #endregion
 

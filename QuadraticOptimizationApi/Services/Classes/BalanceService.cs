@@ -1,5 +1,6 @@
 ﻿using Accord.Math;
 using QuadraticOptimizationApi.Converters;
+using QuadraticOptimizationApi.MathTools;
 using QuadraticOptimizationApi.RequestModels;
 using QuadraticOptimizationApi.ResponseModels;
 using QuadraticOptimizationApi.Services.Interfaces;
@@ -14,6 +15,8 @@ namespace QuadraticOptimizationApi.Services.Classes
 
         private BalanceSolver _solver;
 
+        private GlobalTestCalculator _globalTestCalculator;
+
         private const double accuracy = 0.1E-14;
 
         #endregion
@@ -23,6 +26,7 @@ namespace QuadraticOptimizationApi.Services.Classes
         public BalanceService()
         {
             _solver = new BalanceSolver();
+            _globalTestCalculator = new GlobalTestCalculator();
         }
 
         #endregion
@@ -34,12 +38,15 @@ namespace QuadraticOptimizationApi.Services.Classes
             var dataModel = BalanceDataModelConverter.Convert(request);
             var result = _solver.Solve(dataModel);
 
+            var gtResult = _globalTestCalculator.Calculate(dataModel);
+
             var response = new BalanceResponse
             {
                 BalancedFlows = request.Flows
                 .Select((f, i) => new BalancedFlow { Name = f.Name, Value = result[i] })
                 .ToList(),
-                IsBalanced = CheckBalaced(dataModel.MatrixA, result)
+                IsBalanced = CheckBalaced(dataModel.MatrixA, result),
+                GlobalTestResult = gtResult
             };
 
             return response;

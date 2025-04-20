@@ -18,7 +18,7 @@ namespace QuadraticOptimizationSolver.Solvers
             var w = GetMatrixW(data.Tolerance);
             var h = GetMatrixH(w, i);
             var d = GetVectorD(h, data.VectorX0);
-            return FindMinimum(h, d, data.MatrixA, data.VectorY, data.Flows);
+            return FindMinimum(h, d, data.MatrixA, data.VectorY, data.FlowRanges, data.FlowMeasured);
         }
 
         #endregion
@@ -65,13 +65,19 @@ namespace QuadraticOptimizationSolver.Solvers
             return h.Multiply(x0).Multiply(-1).ToArray();
         }
 
-        private double[] FindMinimum(double[,] matrixH, double[] vectorD, double[,] matrixA, double[] vectorY, FlowDto[] flows)
+        private double[] FindMinimum(
+            double[,] matrixH, 
+            double[] vectorD, 
+            double[,] matrixA, 
+            double[] vectorY, 
+            (RangeDto metrologicRange, RangeDto technologicRange)[] ranges, 
+            bool[] isMeasured)
         {
             var constraints = new List<LinearConstraint>();
-            int n = flows.Length;
+            int n = ranges.Length;
 
             AddBalancingConstraints(ref constraints, matrixA, vectorY, n);
-            AddRangeConstraints(ref constraints, flows);
+            AddRangeConstraints(ref constraints, ranges, isMeasured);
 
             var solver = new GoldfarbIdnani(
                 function: new QuadraticObjectiveFunction(matrixH, vectorD),
@@ -97,12 +103,12 @@ namespace QuadraticOptimizationSolver.Solvers
             }
         }
 
-        private void AddRangeConstraints(ref List<LinearConstraint> constraints, FlowDto[] flows)
+        private void AddRangeConstraints(ref List<LinearConstraint> constraints, (RangeDto metrologicRange, RangeDto technologicRange)[] ranges, bool[] isMeasured)
         {
-            int n = flows.Length;
-            for (int i = 0; i < flows.Length; i++)
+            int n = ranges.Length;
+            for (int i = 0; i < ranges.Length; i++)
             {
-                RangeDto range = flows[i].IsMeasured ? flows[i].MetrologicRange : flows[i].TechnologicRange;
+                RangeDto range = isMeasured[i] ? ranges[i].metrologicRange : ranges[i].technologicRange;
                 AddRangeConstraint(ref constraints, range, n, i);
             }
         }
