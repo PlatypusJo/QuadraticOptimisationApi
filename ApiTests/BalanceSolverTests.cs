@@ -1,4 +1,5 @@
 using Accord.Math;
+using QuadraticOptimizationApi.DTOs;
 using QuadraticOptimizationSolver.DataModels;
 using QuadraticOptimizationSolver.Interfaces;
 using QuadraticOptimizationSolver.Solvers;
@@ -95,7 +96,16 @@ namespace ApiTests
                 VectorY = new double[] { 0, 0, 0 },
                 Tolerance = new double[] { 0.200, 0.121, 0.683, 0.040, 0.102, 0.081, 0.020 },
                 VectorI = new double[] { 1, 1, 1, 1, 1, 1, 1 },
-                VectorX0 = new double[] { 10.005, 3.033, 6.831, 1.985, 5.093, 4.057, 0.991 }
+                VectorX0 = new double[] { 10.005, 3.033, 6.831, 1.985, 5.093, 4.057, 0.991 },
+                FlowRanges = new (RangeDto metrologicRange, RangeDto technologicRange)[] {
+                (metrologicRange: new(){Min = 9.805, Max = 10.205}, technologicRange: new(){Min = 0.0, Max = 1000.0}),
+                (metrologicRange: new(){Min = 2.912, Max = 3.154}, technologicRange: new(){Min = 0.0, Max = 1000.0}),
+                (metrologicRange: new(){Min = 6.148, Max = 7.514}, technologicRange: new(){Min = 0.0, Max = 1000.0}),
+                (metrologicRange: new(){Min = 1.945, Max = 2.025}, technologicRange: new(){Min = 0.0, Max = 1000.0}),
+                (metrologicRange: new(){Min = 4.991, Max = 5.195}, technologicRange: new(){Min = 0.0, Max = 1000.0}),
+                (metrologicRange: new(){Min = 3.976, Max = 4.138}, technologicRange: new(){Min = 0.0, Max = 1000.0}),
+                (metrologicRange: new(){Min = 0.971, Max = 1.011}, technologicRange: new(){Min = 0.0, Max = 1000.0}) },
+                FlowMeasured = [true, true, true, true, true, true, true]
             };
 
             return dataEntity;
@@ -113,7 +123,17 @@ namespace ApiTests
                 VectorY = new double[] { 0, 0, 0 },
                 Tolerance = new double[] { 0.200, 0.121, 0.683, 0.040, 0.102, 0.081, 0.020, 0.667 },
                 VectorI = new double[] { 1, 1, 1, 1, 1, 1, 1, 1 },
-                VectorX0 = new double[] { 10.005, 3.033, 6.831, 1.985, 5.093, 4.057, 0.991, 6.667 }
+                VectorX0 = new double[] { 10.005, 3.033, 6.831, 1.985, 5.093, 4.057, 0.991, 6.667 },
+                FlowRanges = new (RangeDto metrologicRange, RangeDto technologicRange)[] {
+                (metrologicRange: new(){Min = 9.805, Max = 10.205}, technologicRange: new(){Min = 0.0, Max = 1000.0}),
+                (metrologicRange: new(){Min = 2.912, Max = 3.154}, technologicRange: new(){Min = 0.0, Max = 1000.0}),
+                (metrologicRange: new(){Min = 6.148, Max = 7.514}, technologicRange: new(){Min = 0.0, Max = 1000.0}),
+                (metrologicRange: new(){Min = 1.945, Max = 2.025}, technologicRange: new(){Min = 0.0, Max = 1000.0}),
+                (metrologicRange: new(){Min = 4.991, Max = 5.195}, technologicRange: new(){Min = 0.0, Max = 1000.0}),
+                (metrologicRange: new(){Min = 3.976, Max = 4.138}, technologicRange: new(){Min = 0.0, Max = 1000.0}),
+                (metrologicRange: new(){Min = 0.971, Max = 1.011}, technologicRange: new(){Min = 0.0, Max = 1000.0}),
+                (metrologicRange: new(){Min = 6.000, Max = 7.334}, technologicRange: new(){Min = 0.0, Max = 1000.0}) },
+                FlowMeasured = [true, true, true, true, true, true, true, true]
             };
 
             return dataEntity;
@@ -132,7 +152,17 @@ namespace ApiTests
                 VectorY = new double[] { 0, 0, 0, 0 },
                 Tolerance = new double[] { 0.200, 0.121, 0.683, 0.040, 0.102, 0.081, 0.020, 0.667 },
                 VectorI = new double[] { 1, 1, 1, 1, 1, 1, 1, 1 },
-                VectorX0 = new double[] { 10.005, 3.033, 6.831, 1.985, 5.093, 4.057, 0.991, 6.667 }
+                VectorX0 = new double[] { 10.005, 3.033, 6.831, 1.985, 5.093, 4.057, 0.991, 6.667 },
+                FlowRanges = new (RangeDto metrologicRange, RangeDto technologicRange)[] {
+                (metrologicRange: new(){Min = 9.805, Max = 10.205}, technologicRange: new(){Min = 0.0, Max = 1000.0}),
+                (metrologicRange: new(){Min = 2.912, Max = 3.154}, technologicRange: new(){Min = 0.0, Max = 1000.0}),
+                (metrologicRange: new(){Min = 6.148, Max = 7.514}, technologicRange: new(){Min = 0.0, Max = 1000.0}),
+                (metrologicRange: new(){Min = 1.945, Max = 2.025}, technologicRange: new(){Min = 0.0, Max = 1000.0}),
+                (metrologicRange: new(){Min = 4.991, Max = 5.195}, technologicRange: new(){Min = 0.0, Max = 1000.0}),
+                (metrologicRange: new(){Min = 3.976, Max = 4.138}, technologicRange: new(){Min = 0.0, Max = 1000.0}),
+                (metrologicRange: new(){Min = 0.971, Max = 1.011}, technologicRange: new(){Min = 0.0, Max = 1000.0}),
+                (metrologicRange: new(){Min = 6.000, Max = 7.334}, technologicRange: new(){Min = 0.0, Max = 1000.0}) },
+                FlowMeasured = [false, false, true, true, true, true, true, true]
             };
 
             return dataEntity;
