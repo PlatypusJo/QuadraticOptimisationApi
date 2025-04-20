@@ -54,6 +54,7 @@ namespace ApiTests
             var response = Assert.IsType<BalanceResponse>(okResult.Value);
             Assert.Equal(105.0, response.BalancedFlows[0].Value);
             Assert.True(response.IsBalanced);
+            Assert.True(response.GlobalTestResult.IsBalanceValid);
         }
 
     }
