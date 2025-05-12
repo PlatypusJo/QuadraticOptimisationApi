@@ -48,7 +48,7 @@ namespace QuadraticOptimizationApi.MathTools
 
             // 5. Расчет статистики GT
             var vPseudoInv = v.PseudoInverse();
-            var gtOriginal = r.ToRowMatrix() * vPseudoInv * r.ToColumnMatrix();
+            var gtOriginal = (r.ToRowMatrix() * vPseudoInv * r.ToColumnMatrix())[0, 0];
 
             // 6. Расчет критического значения
             const double alpha = 0.05;
@@ -56,13 +56,13 @@ namespace QuadraticOptimizationApi.MathTools
             double gtLimit = ChiSquaredInv(1 - alpha, degreesOfFreedom);
 
             // 7. Нормированное значение GT
-            double gtNormalized = (gtOriginal[0, 0] == 0 && gtLimit == 0)
+            double gtNormalized = (gtOriginal == 0 && gtLimit == 0)
                 ? 0
-                : gtOriginal[0, 0] / gtLimit;
+                : gtOriginal / gtLimit;
 
             return new GlobalTestResult
             {
-                OriginalValue = gtOriginal[0, 0],
+                OriginalValue = gtOriginal,
                 LimitValue = gtLimit,
                 NormalizedValue = gtNormalized,
                 IsBalanceValid = gtNormalized <= 1.0
