@@ -6,7 +6,7 @@
         {
         }
 
-        public BasicSchemeGT(BasicScheme a, double score) : base(a.AdjacencyMatrix, a.Flows, a.AbsoluteTolerance, a.Measurability)
+        public BasicSchemeGT(BasicScheme a, double score) : base(a.AdjacencyMatrix, a.Flows, a.AbsoluteTolerance, a.Measurability, a.Errors)
         {
             GlobalTestRes = score;
         }

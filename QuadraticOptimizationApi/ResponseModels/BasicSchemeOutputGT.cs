@@ -24,6 +24,7 @@ namespace QuadraticOptimizationApi.ResponseModels
             Flows = data.Flows;
             AbsoluteTolerance = data.AbsoluteTolerance;
             Measurability = data.Measurability;
+            Errors = data.Errors;
             GlobalTestResult = data.GlobalTestRes;
         }
 
@@ -36,5 +37,7 @@ namespace QuadraticOptimizationApi.ResponseModels
         public bool[] Measurability { get; set; }
 
         public double GlobalTestResult { get; set; }
+
+        public Error[] Errors { get; set; } 
     }
 }

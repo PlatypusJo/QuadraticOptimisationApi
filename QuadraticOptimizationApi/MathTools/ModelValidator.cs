@@ -4,6 +4,7 @@ using Accord.Statistics.Distributions.Univariate;
 using QuadraticOptimizationSolver.DataModels;
 using System.Collections.Concurrent;
 using Accord.Math;
+using System.Xml.Linq;
 
 namespace QuadraticOptimizationApi.MathTools
 {
@@ -123,20 +124,25 @@ namespace QuadraticOptimizationApi.MathTools
 
                     if (i >= inds.Length)
                     {
-                        var newData = new BasicScheme(a, b + 1);
-                        newData.CopyValues(data.AdjacencyMatrix, data.Flows, data.AbsoluteTolerance, data.Measurability);
+                        var newData = new BasicScheme(a, b + 1, data.Errors.Length + 1);
+                        newData.CopyValues(data.AdjacencyMatrix, data.Flows, data.AbsoluteTolerance, data.Measurability, data.Errors);
 
                         newData.AdjacencyMatrix[i - inds.Length, b] = -1;
+                        Error error = DetectError(data.AdjacencyMatrix, newData.AdjacencyMatrix);
+                        newData.Errors[data.Errors.Length] = error;
 
                         FixModel(newData, result, maxDepth, maxWidth, currentDepth + 1);
                     }
                     else if (glrMatrix[inds[i][0], inds[i][1]] > 0)
                     {
-                        var newData = new BasicScheme(a, b + 1);
-                        newData.CopyValues(data.AdjacencyMatrix, data.Flows, data.AbsoluteTolerance, data.Measurability);
+                        var newData = new BasicScheme(a, b + 1, data.Errors.Length + 1);
+                        newData.CopyValues(data.AdjacencyMatrix, data.Flows, data.AbsoluteTolerance, data.Measurability, data.Errors);
 
                         newData.AdjacencyMatrix[inds[i][0], b] = 1;
                         newData.AdjacencyMatrix[inds[i][1], b] = -1;
+
+                        Error error = DetectError(data.AdjacencyMatrix, newData.AdjacencyMatrix);
+                        newData.Errors[data.Errors.Length] = error;
 
                         FixModel(newData, result, maxDepth, maxWidth, currentDepth + 1);
                     }
@@ -222,6 +228,128 @@ namespace QuadraticOptimizationApi.MathTools
             }
 
             return res;
+        }
+
+        protected Error DetectError(double[,] original, double[,] modified)
+        {
+            Error error = new();
+            if (IsLostFlowOrMeasError(original, modified, out error))
+            {
+                return error;
+            }
+
+            if (IsLeak(original, modified, out error))
+            {
+                return error;
+            }
+
+            error.Type = ErrorTypes.Unknown;
+            return error;
+        }
+
+        protected bool IsLostFlowOrMeasError(double[,] original, double[,] modified, out Error error)
+        {
+            error = new();
+            int modifNodes = modified.GetLength(0);
+            int modifFlows = modified.GetLength(1) - 1;
+
+            int node1 = -1;
+            int node2 = -1;
+
+            for (int i = 0; i < modifNodes && (node1 < 0 && node2 < 0); i++)
+            {
+                if (modified[i, modifFlows] == 1)
+                    node1 = i;
+
+                if (modified[i, modifFlows] == -1)
+                    node2 = i;
+            }
+
+            if (node1 < 0 || node2 < 0)
+                return false;
+
+            int origLen = original.GetLength(1);
+            bool flag = false;
+            for (int i = 0; i < origLen; i++)
+            {
+                if ((original[node1, i] == 1 && original[node2, i] == -1) 
+                    || (original[node2, i] == 1 && original[node1, i] == -1))
+                {
+                    flag = true;
+                    break;
+                }
+            }
+
+            if (flag)
+            {
+                error.Nodes = [$"N{node1 + 1}", $"N{node2 + 1}"];
+                error.Type = ErrorTypes.MeasError;
+                return true;
+            }
+            else
+            {
+                error.Nodes = [$"N{node1 + 1}", $"N{node2 + 1}"];
+                error.Type = ErrorTypes.LostFlow;
+                return true;
+            }
+        }
+
+        protected bool IsLeak(double[,] original, double[,] modified, out Error error)
+        {
+            error = new();
+            int modifNodes = modified.GetLength(0);
+            int modifFlows = modified.GetLength(1) - 1;
+
+            int node = -1;
+
+            for (int i = 0; i < modifNodes; i++)
+            {
+                if (modified[i, modifFlows] == -1)
+                { 
+                    node = i;
+                    break;
+                }
+            }
+
+            if (node < 0)
+                return false;
+
+            int origLen = original.GetLength(1);
+            int flow = -1;
+            for (int i = 0; i < origLen; i++)
+            {
+                if (original[node, i] == -1)
+                {
+                    flow = i;
+                    break;
+                }
+            }
+
+            if (flow < 0)
+                return false;
+
+            int origNodes = original.GetLength(0);
+            bool hasInput = false;
+            for (int i = 0; i < origNodes; i++)
+            {
+                if (original[i, flow] == 1)
+                {
+                    hasInput = true;
+                    break;
+                }
+            }
+
+            if (!hasInput)
+            {
+                error.Nodes = [$"N{node + 1}"];
+                error.Type = ErrorTypes.Leak;
+                return !hasInput;
+            }
+            else
+            {
+                error.Nodes = [$"N{node + 1}"];
+                return hasInput;
+            }
         }
     }
 }
