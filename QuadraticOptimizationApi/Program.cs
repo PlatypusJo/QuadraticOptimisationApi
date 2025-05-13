@@ -1,4 +1,5 @@
 
+using QuadraticOptimizationApi.MathTools;
 using QuadraticOptimizationApi.Services.Classes;
 using QuadraticOptimizationApi.Services.Interfaces;
 
@@ -25,6 +26,7 @@ namespace QuadraticOptimizationApi
 
             builder.Services.AddControllers();
             builder.Services.AddSingleton<IBalanceService, BalanceService>();
+            builder.Services.AddSingleton<IModelValidator, ModelValidator>();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();

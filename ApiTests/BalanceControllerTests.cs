@@ -18,7 +18,7 @@ namespace ApiTests
 {
     public class BalanceControllerTests
     {
-        private readonly Mock<GlobalTestCalculator> _mockCalculator = new();
+        private readonly Mock<ModelValidator> _mockCalculator = new();
         private readonly Mock<IBalanceService> _mockBalanceService = new();
         private BalanceController _controller;
 
@@ -26,7 +26,7 @@ namespace ApiTests
         public void SolveBalance_ValidRequest_ReturnsOkResult()
         {
             // Arrange
-            _controller = new BalanceController(_mockBalanceService.Object);
+            _controller = new BalanceController(_mockBalanceService.Object, null);
             var request = new BalanceRequest
             {
                 Flows = new List<FlowDto>

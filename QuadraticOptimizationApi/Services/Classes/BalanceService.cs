@@ -15,7 +15,7 @@ namespace QuadraticOptimizationApi.Services.Classes
 
         private BalanceSolver _solver;
 
-        private GlobalTestCalculator _globalTestCalculator;
+        private ModelValidator _globalTestCalculator;
 
         private const double accuracy = 0.1E-14;
 
@@ -26,7 +26,7 @@ namespace QuadraticOptimizationApi.Services.Classes
         public BalanceService()
         {
             _solver = new BalanceSolver();
-            _globalTestCalculator = new GlobalTestCalculator();
+            _globalTestCalculator = new ModelValidator();
         }
 
         #endregion
@@ -38,7 +38,7 @@ namespace QuadraticOptimizationApi.Services.Classes
             var dataModel = BalanceDataModelConverter.Convert(request);
             var result = _solver.Solve(dataModel);
 
-            var gtResult = _globalTestCalculator.Calculate(dataModel);
+            var gtResult = _globalTestCalculator.ConductGlobalTest(dataModel);
 
             var response = new BalanceResponse
             {

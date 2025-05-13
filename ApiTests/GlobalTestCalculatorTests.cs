@@ -13,7 +13,7 @@ namespace ApiTests
     {
         #region Поля
 
-        private readonly GlobalTestCalculator _calculator = new GlobalTestCalculator();
+        private readonly ModelValidator _calculator = new ModelValidator();
 
         #endregion
 
@@ -26,7 +26,7 @@ namespace ApiTests
             var dataModel = GetDataModelOriginal();
 
             // Act
-            var result = _calculator.Calculate(dataModel);
+            var result = _calculator.ConductGlobalTest(dataModel);
 
             //// Assert
             Assert.NotNull(result);
@@ -42,7 +42,7 @@ namespace ApiTests
             var dataModel = GetDataModelOriginalWithErrors();
 
             // Act
-            var result = _calculator.Calculate(dataModel);
+            var result = _calculator.ConductGlobalTest(dataModel);
 
             //// Assert
             Assert.False(result.IsBalanceValid);

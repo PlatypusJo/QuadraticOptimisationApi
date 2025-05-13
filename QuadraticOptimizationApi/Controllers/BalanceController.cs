@@ -1,5 +1,7 @@
 using MathNet.Numerics.LinearAlgebra.Factorization;
 using Microsoft.AspNetCore.Mvc;
+using QuadraticOptimizationApi.Converters;
+using QuadraticOptimizationApi.MathTools;
 using QuadraticOptimizationApi.RequestModels;
 using QuadraticOptimizationApi.ResponseModels;
 using QuadraticOptimizationApi.Services.Interfaces;
@@ -15,13 +17,16 @@ public class BalanceController : ControllerBase
 
     private readonly IBalanceService _balanceService;
 
+    private readonly IModelValidator _modelValidator;
+
     #endregion
 
     #region Constructors
 
-    public BalanceController(IBalanceService balanceService)
+    public BalanceController(IBalanceService balanceService, IModelValidator modelValidator)
     {
         _balanceService = balanceService;
+        _modelValidator = modelValidator;
     }
 
     #endregion
@@ -34,6 +39,22 @@ public class BalanceController : ControllerBase
         var response = _balanceService.Solve(request);
 
         return Ok(response);
+    }
+
+    [HttpPost("FixModel")]
+    public ResponseStatus<List<BasicSchemeOutputGT>> FixModel(BalanceRequest data, int width, int depth)
+    {
+        var model = BalanceDataModelConverter.Convert(data);
+        var input = new BasicScheme(model.MatrixA, model.VectorX0, model.Tolerance, model.FlowMeasured);
+        var res = new List<BasicSchemeGT>();
+
+        _modelValidator.FixModel(
+            input,
+            res,
+            depth,
+            width);
+
+        return new ResponseStatus<List<BasicSchemeOutputGT>>(res.Select(x => new BasicSchemeOutputGT(x)).ToList(), "Fixed models.");
     }
 
     #endregion
