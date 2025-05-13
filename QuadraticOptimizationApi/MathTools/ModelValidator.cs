@@ -101,30 +101,40 @@ namespace QuadraticOptimizationApi.MathTools
                 var glrMatrix = GetGLRScores(data.AdjacencyMatrix, data.Flows, data.AbsoluteTolerance, data.Measurability, nodes, originalScore);
                 int a = data.AdjacencyMatrix.GetLength(0);
                 int b = data.AdjacencyMatrix.GetLength(1);
-                int grlLen = glrMatrix.GetLength(0);
+                int glrLen = glrMatrix.GetLength(0) - 1;
 
                 var inds = nodes.GetIndices().ToArray();
 
                 inds = inds.OrderByDescending(i => glrMatrix[i[0], i[1]]).ToArray();
                 int currentMaxWidth = maxWidth;
 
-                var res = Parallel.For(0, inds.Length, (int i) =>
+                var res = Parallel.For(0, inds.Length + glrLen, (int i) =>
                 {
                     if (i >= currentMaxWidth || i % 2 == 1)
                     {
                         return;
                     }
 
-                    if (inds[i][0] == inds[i][1])
+                    if (i < inds.Length && inds[i][0] == inds[i][1])
                     {
                         currentMaxWidth += 2;
                         return;
                     }
 
-                    if (glrMatrix[inds[i][0], inds[i][1]] > 0)
+                    if (i >= inds.Length)
                     {
                         var newData = new BasicScheme(a, b + 1);
                         newData.CopyValues(data.AdjacencyMatrix, data.Flows, data.AbsoluteTolerance, data.Measurability);
+
+                        newData.AdjacencyMatrix[i - inds.Length, b] = -1;
+
+                        FixModel(newData, result, maxDepth, maxWidth, currentDepth + 1);
+                    }
+                    else if (glrMatrix[inds[i][0], inds[i][1]] > 0)
+                    {
+                        var newData = new BasicScheme(a, b + 1);
+                        newData.CopyValues(data.AdjacencyMatrix, data.Flows, data.AbsoluteTolerance, data.Measurability);
+
                         newData.AdjacencyMatrix[inds[i][0], b] = 1;
                         newData.AdjacencyMatrix[inds[i][1], b] = -1;
 
