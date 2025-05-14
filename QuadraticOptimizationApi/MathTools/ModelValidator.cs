@@ -256,7 +256,7 @@ namespace QuadraticOptimizationApi.MathTools
             int node1 = -1;
             int node2 = -1;
 
-            for (int i = 0; i < modifNodes && (node1 < 0 && node2 < 0); i++)
+            for (int i = 0; i < modifNodes && (node1 < 0 || node2 < 0); i++)
             {
                 if (modified[i, modifFlows] == 1)
                     node1 = i;
