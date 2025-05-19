@@ -4,6 +4,7 @@ using QuadraticOptimizationApi.MathTools;
 using QuadraticOptimizationApi.RequestModels;
 using QuadraticOptimizationApi.ResponseModels;
 using QuadraticOptimizationApi.Services.Interfaces;
+using QuadraticOptimizationSolver.DataModels;
 using QuadraticOptimizationSolver.Interfaces;
 using QuadraticOptimizationSolver.Solvers;
 
@@ -46,6 +47,24 @@ namespace QuadraticOptimizationApi.Services.Classes
                 .Select((f, i) => new BalancedFlow { Name = f.Name, Value = result[i] })
                 .ToList(),
                 IsBalanced = CheckBalaced(dataModel.MatrixA, result),
+                GlobalTestResult = gtResult
+            };
+
+            return response;
+        }
+
+        public BalanceResponse Solve(BalanceDataModel model)
+        {
+            var result = _solver.Solve(model);
+
+            var gtResult = _globalTestCalculator.ConductGlobalTest(model);
+
+            var response = new BalanceResponse
+            {
+                BalancedFlows = model.VectorX0
+                .Select((f, i) => new BalancedFlow { Name = $"X{i + 1}", Value = result[i] })
+                .ToList(),
+                IsBalanced = CheckBalaced(model.MatrixA, result),
                 GlobalTestResult = gtResult
             };
 

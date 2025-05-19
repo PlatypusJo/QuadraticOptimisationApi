@@ -103,6 +103,73 @@ namespace QuadraticOptimizationApi.Converters
             matrixA = newMatrixA;
         }
 
+        public static BalanceRequest ConvertToBalanceRequest(BalanceDataModel balanceModel, List<string> flowNames)
+        {
+            if (balanceModel == null)
+                throw new ArgumentNullException(nameof(balanceModel));
+            if (flowNames == null || flowNames.Count != balanceModel.MatrixA.GetLength(1))
+                throw new ArgumentException("Flow names count must match matrix columns", nameof(flowNames));
+
+            var request = new BalanceRequest
+            {
+                Nodes = new List<NodeDto>(),
+                Flows = new List<FlowDto>(),
+                Constraints = new List<ConstraintDto>()
+            };
+
+            // 1. Восстанавливаем потоки (FlowDto)
+            for (int i = 0; i < flowNames.Count; i++)
+            {
+                request.Flows.Add(new FlowDto
+                {
+                    Name = flowNames[i],
+                    MeasuredValue = balanceModel.VectorX0 != null && i < balanceModel.VectorX0.Length
+                        ? balanceModel.VectorX0[i]
+                        : 0,
+                    Tolerance = balanceModel.Tolerance != null && i < balanceModel.Tolerance.Length
+                        ? balanceModel.Tolerance[i]
+                        : 0,
+                    IsMeasured = balanceModel.FlowMeasured != null && i < balanceModel.FlowMeasured.Length
+                        ? balanceModel.FlowMeasured[i]
+                        : false,
+                    MetrologicRange = balanceModel.FlowRanges != null && i < balanceModel.FlowRanges.Length
+                        ? balanceModel.FlowRanges[i].metrologicRange
+                        : new RangeDto() { Min = 0, Max = 0 },
+                    TechnologicRange = balanceModel.FlowRanges != null && i < balanceModel.FlowRanges.Length
+                        ? balanceModel.FlowRanges[i].technologicRange
+                        : new RangeDto() { Min = 0, Max = 0 },
+                });
+            }
+
+            // 2. Восстанавливаем узлы (NodeDto) из матрицы баланса
+            int nodeCount = balanceModel.MatrixA.GetLength(0);
+            for (int i = 0; i < nodeCount; i++)
+            {
+                var node = new NodeDto
+                {
+                    Name = $"Node_{i + 1}",
+                    InputFlows = new List<string>(),
+                    OutputFlows = new List<string>()
+                };
+
+                for (int j = 0; j < flowNames.Count; j++)
+                {
+                    double value = balanceModel.MatrixA[i, j];
+                    if (Math.Abs(value) > double.Epsilon)
+                    {
+                        if (value > 0)
+                            node.InputFlows.Add(flowNames[j]);
+                        else
+                            node.OutputFlows.Add(flowNames[j]);
+                    }
+                }
+
+                request.Nodes.Add(node);
+            }
+
+            return request;
+        }
+
         public static BalanceDataModel ConvertFromBasicScheme(BalanceDataModel origData, BasicSchemeGT basicScheme, (int origFlow, int newFlow)[] flowInds)
         {
             // Создаем модель баланса
@@ -159,6 +226,8 @@ namespace QuadraticOptimizationApi.Converters
                     new RangeDto() { Min = 0, Max = 0 },
                     new RangeDto() { Min = min, Max = max }
                 );
+
+                balanceDataModel.Tolerance[newIndex] = origData.VectorX0[origIndex];
             }
 
             return balanceDataModel;

@@ -5,6 +5,8 @@ using QuadraticOptimizationSolver.DataModels;
 using System.Collections.Concurrent;
 using Accord.Math;
 using System.Xml.Linq;
+using QuadraticOptimizationSolver.Solvers;
+using QuadraticOptimizationApi.DTOs;
 
 namespace QuadraticOptimizationApi.MathTools
 {
@@ -77,6 +79,24 @@ namespace QuadraticOptimizationApi.MathTools
         {
             // Используем Accord.Statistics для точного расчета
             return new ChiSquareDistribution(degreesOfFreedom).InverseDistributionFunction(p);
+        }
+
+        public BalanceDataModel FixModel(BalanceDataModel origModel, BalanceResponse newModel, (int origFlow, int newFlow)[] flowInds)
+        {
+            for (int i = 0; i < flowInds.Length; i++)
+            {
+                int origIndex = flowInds[i].origFlow;
+                int newIndex = flowInds[i].newFlow;
+
+                origModel.VectorX0[origIndex] -= newModel.BalancedFlows[newIndex].Value;
+                origModel.FlowRanges[origIndex].metrologicRange = new RangeDto()
+                {
+                    Min = origModel.VectorX0[origIndex] - origModel.Tolerance[origIndex],
+                    Max = origModel.VectorX0[origIndex] + origModel.Tolerance[origIndex]
+                };
+            }
+
+            return origModel;
         }
 
         public void DetectErrors(BasicScheme data, List<BasicSchemeGT> result, int maxDepth = 1000, int maxWidth = 1000, int currentDepth = 1)
