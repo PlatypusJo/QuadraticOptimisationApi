@@ -7,6 +7,6 @@ namespace QuadraticOptimizationApi.MathTools
     {
         GlobalTestResult ConductGlobalTest(BalanceDataModel data);
 
-        void FixModel(BasicScheme data, List<BasicSchemeGT> result, int maxDepth = 1000, int maxWidth = 1000, int currentDepth = 1);
+        void DetectErrors(BasicScheme data, List<BasicSchemeGT> result, int maxDepth = 1000, int maxWidth = 1000, int currentDepth = 1);
     }
 }

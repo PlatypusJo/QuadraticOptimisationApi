@@ -42,13 +42,13 @@ public class BalanceController : ControllerBase
     }
 
     [HttpPost("FixModel")]
-    public ResponseStatus<List<BasicSchemeOutputGT>> FixModel(BalanceRequest data, int width, int depth)
+    public ResponseStatus<List<BasicSchemeOutputGT>> DetectErrors(BalanceRequest data, int width, int depth)
     {
         var model = BalanceDataModelConverter.Convert(data);
         var input = new BasicScheme(model.MatrixA, model.VectorX0, model.Tolerance, model.FlowMeasured);
         var res = new List<BasicSchemeGT>();
 
-        _modelValidator.FixModel(
+        _modelValidator.DetectErrors(
             input,
             res,
             depth,

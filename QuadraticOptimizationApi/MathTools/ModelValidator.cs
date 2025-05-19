@@ -79,14 +79,14 @@ namespace QuadraticOptimizationApi.MathTools
             return new ChiSquareDistribution(degreesOfFreedom).InverseDistributionFunction(p);
         }
 
-        public void FixModel(BasicScheme data, List<BasicSchemeGT> result, int maxDepth = 1000, int maxWidth = 1000, int currentDepth = 1)
+        public void DetectErrors(BasicScheme data, List<BasicSchemeGT> result, int maxDepth = 1000, int maxWidth = 1000, int currentDepth = 1)
         {
             var stack = new ConcurrentStack<BasicSchemeGT>(result);
-            FixModel(data, stack, maxDepth, maxWidth, currentDepth);
+            DetectErrors(data, stack, maxDepth, maxWidth, currentDepth);
             result.AddRange(stack);
         }
 
-        public void FixModel(BasicScheme data, ConcurrentStack<BasicSchemeGT> result, int maxDepth = 1000, int maxWidth = 1000, int currentDepth = 1)
+        public void DetectErrors(BasicScheme data, ConcurrentStack<BasicSchemeGT> result, int maxDepth = 1000, int maxWidth = 1000, int currentDepth = 1)
         {
             double originalScore = ConductGlobalTest(data.Flows, data.AdjacencyMatrix, data.AbsoluteTolerance, data.Measurability).NormalizedValue;
 
@@ -131,7 +131,7 @@ namespace QuadraticOptimizationApi.MathTools
                         Error error = DetectError(data.AdjacencyMatrix, newData.AdjacencyMatrix);
                         newData.Errors[data.Errors.Length] = error;
 
-                        FixModel(newData, result, maxDepth, maxWidth, currentDepth + 1);
+                        DetectErrors(newData, result, maxDepth, maxWidth, currentDepth + 1);
                     }
                     else if (glrMatrix[inds[i][0], inds[i][1]] > 0)
                     {
@@ -144,7 +144,7 @@ namespace QuadraticOptimizationApi.MathTools
                         Error error = DetectError(data.AdjacencyMatrix, newData.AdjacencyMatrix);
                         newData.Errors[data.Errors.Length] = error;
 
-                        FixModel(newData, result, maxDepth, maxWidth, currentDepth + 1);
+                        DetectErrors(newData, result, maxDepth, maxWidth, currentDepth + 1);
                     }
                 });
 
