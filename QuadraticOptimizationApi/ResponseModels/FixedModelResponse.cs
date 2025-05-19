@@ -5,7 +5,22 @@ namespace QuadraticOptimizationApi.ResponseModels
 {
     public class FixedModelResponse
     {
-        public required BalanceRequest FixedModel { get; set; }
-        public required BalanceResponse BalanceFixedModel { get; set; }
+        public BalanceRequest FixedModel { get; set; }
+        public BalanceResponse BalanceFixedModel { get; set; }
+
+        public FixedModelResponse(BalanceRequest fixedModel, BalanceResponse balanceFixedModel)
+        {
+            FixedModel = fixedModel;
+            BalanceFixedModel = balanceFixedModel;
+
+            #region 
+
+            for (int i = 0; i < FixedModel.Flows.Count; i++)
+            {
+                FixedModel.Flows[i].IsMeasured = true;
+            }
+
+            #endregion
+        }
     }
 }

@@ -95,7 +95,9 @@ namespace QuadraticOptimizationApi.MathTools
                     Max = origModel.VectorX0[origIndex] + origModel.Tolerance[origIndex]
                 };
 
+                #region 
                 origModel.FlowMeasured[origIndex] = false;
+                #endregion
             }
 
             return origModel;

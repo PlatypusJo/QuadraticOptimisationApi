@@ -88,7 +88,7 @@ public class BalanceController : ControllerBase
         var fixedRequest = BalanceDataModelConverter.ConvertToBalanceRequest(fixedModel, fixedModel.VectorX0.Select((f, i) => $"X{i + 1}").ToList());
         var balanceFixedModel = _balanceService.Solve(fixedRequest);
 
-        var response = new FixedModelResponse() { BalanceFixedModel = balanceFixedModel, FixedModel = fixedRequest };
+        var response = new FixedModelResponse(fixedRequest, balanceFixedModel);
 
         return Ok(response);
     }

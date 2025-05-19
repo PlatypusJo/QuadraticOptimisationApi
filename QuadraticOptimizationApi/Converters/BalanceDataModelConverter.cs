@@ -227,7 +227,7 @@ namespace QuadraticOptimizationApi.Converters
                     new RangeDto() { Min = min, Max = max }
                 );
 
-                balanceDataModel.Tolerance[newIndex] = 1.0;
+                balanceDataModel.Tolerance[newIndex] = 100.0;
             }
 
             return balanceDataModel;
