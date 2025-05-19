@@ -270,12 +270,14 @@ namespace QuadraticOptimizationApi.MathTools
 
             int origLen = original.GetLength(1);
             bool flag = false;
+            int problemFlow = 0;
             for (int i = 0; i < origLen; i++)
             {
                 if ((original[node1, i] == 1 && original[node2, i] == -1) 
                     || (original[node2, i] == 1 && original[node1, i] == -1))
                 {
                     flag = true;
+                    problemFlow = i;
                     break;
                 }
             }
@@ -284,12 +286,14 @@ namespace QuadraticOptimizationApi.MathTools
             {
                 error.Nodes = [$"N{node1 + 1}", $"N{node2 + 1}"];
                 error.Type = ErrorTypes.MeasError;
+                error.FlowIndex = problemFlow;
                 return true;
             }
             else
             {
                 error.Nodes = [$"N{node1 + 1}", $"N{node2 + 1}"];
                 error.Type = ErrorTypes.LostFlow;
+                error.FlowIndex = -1;
                 return true;
             }
         }
@@ -343,11 +347,13 @@ namespace QuadraticOptimizationApi.MathTools
             {
                 error.Nodes = [$"N{node + 1}"];
                 error.Type = ErrorTypes.Leak;
+                error.FlowIndex = -1;
                 return !hasInput;
             }
             else
             {
                 error.Nodes = [$"N{node + 1}"];
+                error.FlowIndex = -1;
                 return hasInput;
             }
         }
