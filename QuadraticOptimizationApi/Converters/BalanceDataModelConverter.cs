@@ -178,13 +178,13 @@ namespace QuadraticOptimizationApi.Converters
                 // Матрица A - это просто AdjacencyMatrix из BasicScheme
                 MatrixA = (double[,])basicScheme.AdjacencyMatrix.Clone(),
 
-                // Вектор Y - обычно нулевой вектор для уравнений баланса (A*X = Y)
+                // Вектор Y
                 VectorY = new double[basicScheme.AdjacencyMatrix.GetLength(0)],
 
                 // Допуски берем из AbsoluteTolerance
                 Tolerance = (double[])basicScheme.AbsoluteTolerance.Clone(),
 
-                // Вектор I - можно использовать Flows (измеренные значения потоков)
+                // Вектор I
                 VectorI = Enumerable.Repeat(1.0, basicScheme.Flows.Length).ToArray(),
 
                 // Вектор X0 - начальные значения, тоже можно использовать Flows
