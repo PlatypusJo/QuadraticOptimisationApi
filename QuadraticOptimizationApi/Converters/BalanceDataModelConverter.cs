@@ -1,4 +1,5 @@
 ﻿using QuadraticOptimizationApi.DTOs;
+using QuadraticOptimizationApi.MathTools;
 using QuadraticOptimizationApi.RequestModels;
 using QuadraticOptimizationSolver.DataModels;
 
@@ -100,6 +101,45 @@ namespace QuadraticOptimizationApi.Converters
             }
 
             matrixA = newMatrixA;
+        }
+
+        public static BalanceDataModel ConvertFromBasicScheme(BasicScheme basicScheme)
+        {
+            // Создаем модель баланса
+            var balanceDataModel = new BalanceDataModel
+            {
+                // Матрица A - это просто AdjacencyMatrix из BasicScheme
+                MatrixA = (double[,])basicScheme.AdjacencyMatrix.Clone(),
+
+                // Вектор Y - обычно нулевой вектор для уравнений баланса (A*X = Y)
+                VectorY = new double[basicScheme.AdjacencyMatrix.GetLength(0)],
+
+                // Допуски берем из AbsoluteTolerance
+                Tolerance = (double[])basicScheme.AbsoluteTolerance.Clone(),
+
+                // Вектор I - можно использовать Flows (измеренные значения потоков)
+                VectorI = (double[])basicScheme.Flows.Clone(),
+
+                // Вектор X0 - начальные значения, тоже можно использовать Flows
+                VectorX0 = (double[])basicScheme.Flows.Clone(),
+
+                // Признаки наличия датчиков
+                FlowMeasured = (bool[])basicScheme.Measurability.Clone(),
+
+                // Интервальные ограничения - создаем пустые, так как в BasicScheme этой информации нет
+                FlowRanges = new (RangeDto metrologicRange, RangeDto technologicRange)[basicScheme.Flows.Length]
+            };
+
+            // Инициализируем интервальные ограничения (можно задать какие-то дефолтные значения)
+            for (int i = 0; i < balanceDataModel.FlowRanges.Length; i++)
+            {
+                balanceDataModel.FlowRanges[i] = (
+                    new RangeDto() { Max = 0, Min = 0 }, // метрологические ограничения (можно использовать допуски)
+                    new RangeDto() { Max = 0, Min = 0 } // технологические ограничения (нет информации в BasicScheme)
+                );
+            }
+
+            return balanceDataModel;
         }
     }
 }

@@ -287,6 +287,7 @@ namespace QuadraticOptimizationApi.MathTools
                 error.Nodes = [$"N{node1 + 1}", $"N{node2 + 1}"];
                 error.Type = ErrorTypes.MeasError;
                 error.FlowIndex = problemFlow;
+                error.NewFlowIndex = modifFlows;
                 return true;
             }
             else
@@ -294,6 +295,7 @@ namespace QuadraticOptimizationApi.MathTools
                 error.Nodes = [$"N{node1 + 1}", $"N{node2 + 1}"];
                 error.Type = ErrorTypes.LostFlow;
                 error.FlowIndex = -1;
+                error.NewFlowIndex = modifFlows;
                 return true;
             }
         }
@@ -348,12 +350,14 @@ namespace QuadraticOptimizationApi.MathTools
                 error.Nodes = [$"N{node + 1}"];
                 error.Type = ErrorTypes.Leak;
                 error.FlowIndex = -1;
+                error.NewFlowIndex = modifFlows;
                 return !hasInput;
             }
             else
             {
                 error.Nodes = [$"N{node + 1}"];
                 error.FlowIndex = -1;
+                error.NewFlowIndex = modifFlows;
                 return hasInput;
             }
         }
