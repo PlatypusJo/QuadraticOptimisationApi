@@ -88,7 +88,7 @@ namespace QuadraticOptimizationApi.MathTools
                 int origIndex = flowInds[i].origFlow;
                 int newIndex = flowInds[i].newFlow;
 
-                origModel.VectorX0[origIndex] -= newModel.BalancedFlows[newIndex].Value;
+                origModel.VectorX0[origIndex] += newModel.BalancedFlows[newIndex].Value;
                 origModel.FlowRanges[origIndex].metrologicRange = new RangeDto()
                 {
                     Min = origModel.VectorX0[origIndex] - origModel.Tolerance[origIndex],

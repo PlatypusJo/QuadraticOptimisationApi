@@ -147,7 +147,7 @@ namespace QuadraticOptimizationApi.Converters
             {
                 var node = new NodeDto
                 {
-                    Name = $"Node_{i + 1}",
+                    Name = $"N{i + 1}",
                     InputFlows = new List<string>(),
                     OutputFlows = new List<string>()
                 };
@@ -205,12 +205,12 @@ namespace QuadraticOptimizationApi.Converters
                 );
             }
 
-            // Инициализируем интервальные ограничения (можно задать какие-то дефолтные значения)
+            // Инициализируем интервальные ограничения
             for (int i = 0; i < origData.FlowRanges.Length; i++)
             {
                 balanceDataModel.FlowRanges[i] = (
-                    origData.FlowRanges[i].metrologicRange, // метрологические ограничения (можно использовать допуски)
-                    origData.FlowRanges[i].technologicRange // технологические ограничения (нет информации в BasicScheme)
+                    origData.FlowRanges[i].metrologicRange, // метрологические ограничения
+                    origData.FlowRanges[i].technologicRange // технологические ограничения 
                 );
             }
 

@@ -18,7 +18,7 @@ namespace QuadraticOptimizationApi.Services.Classes
 
         private ModelValidator _globalTestCalculator;
 
-        private const double accuracy = 0.1E-14;
+        private const double accuracy = 0.1E-4;
 
         #endregion
 
