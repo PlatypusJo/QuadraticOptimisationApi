@@ -83,9 +83,11 @@ public class BalanceController : ControllerBase
         BalanceDataModel newModel = BalanceDataModelConverter.ConvertFromBasicScheme(model, bestScenario, flowInds);
         var newRequest = BalanceDataModelConverter.ConvertToBalanceRequest(newModel, newModel.VectorX0.Select((f, i) => $"X{i + 1}").ToList());
         BalanceResponse balancedModel = _balanceService.Solve(newRequest);
+
         BalanceDataModel fixedModel = _modelValidator.FixModel(model, balancedModel, flowInds);
-        var balanceFixedModel = _balanceService.Solve(BalanceDataModelConverter.ConvertToBalanceRequest(fixedModel, fixedModel.VectorX0.Select((f, i) => $"X{i + 1}").ToList()));
         var fixedRequest = BalanceDataModelConverter.ConvertToBalanceRequest(fixedModel, fixedModel.VectorX0.Select((f, i) => $"X{i + 1}").ToList());
+        var balanceFixedModel = _balanceService.Solve(fixedRequest);
+
         var response = new FixedModelResponse() { BalanceFixedModel = balanceFixedModel, FixedModel = fixedRequest };
 
         return Ok(response);
