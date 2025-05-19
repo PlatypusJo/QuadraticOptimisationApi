@@ -294,7 +294,7 @@ namespace QuadraticOptimizationApi.MathTools
             {
                 error.Nodes = [$"N{node1 + 1}", $"N{node2 + 1}"];
                 error.Type = ErrorTypes.LostFlow;
-                error.FlowIndex = -1;
+                error.FlowIndex = FindProblemFlow(node1, node2, modifFlows, original, modified);
                 error.NewFlowIndex = modifFlows;
                 return true;
             }
@@ -349,17 +349,35 @@ namespace QuadraticOptimizationApi.MathTools
             {
                 error.Nodes = [$"N{node + 1}"];
                 error.Type = ErrorTypes.Leak;
-                error.FlowIndex = -1;
+                error.FlowIndex = flow;
                 error.NewFlowIndex = modifFlows;
                 return !hasInput;
             }
             else
             {
                 error.Nodes = [$"N{node + 1}"];
-                error.FlowIndex = -1;
+                error.FlowIndex = flow;
                 error.NewFlowIndex = modifFlows;
                 return hasInput;
             }
+        }
+
+        protected int FindProblemFlow(int node1, int node2, int flow, double[,] original, double[,] modified)
+        {
+            int nodeOut = modified[node1, flow] == -1.0 ? node1 : node2;
+            int flows = original.GetLength(1);
+            int inputFlow = 0;
+
+            for (int i = 0; i < flows; i++)
+            {
+                if (original[nodeOut, i] == 1.0)
+                {
+                    inputFlow = i;
+                    break;
+                }
+            }
+
+            return inputFlow;
         }
     }
 }

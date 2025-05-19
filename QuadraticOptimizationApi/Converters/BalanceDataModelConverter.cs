@@ -103,7 +103,7 @@ namespace QuadraticOptimizationApi.Converters
             matrixA = newMatrixA;
         }
 
-        public static BalanceDataModel ConvertFromBasicScheme(BasicScheme basicScheme)
+        public static BalanceDataModel ConvertFromBasicScheme(BalanceDataModel origData, BasicSchemeGT basicScheme, (int origFlow, int newFlow)[] flowInds)
         {
             // Создаем модель баланса
             var balanceDataModel = new BalanceDataModel
@@ -118,7 +118,7 @@ namespace QuadraticOptimizationApi.Converters
                 Tolerance = (double[])basicScheme.AbsoluteTolerance.Clone(),
 
                 // Вектор I - можно использовать Flows (измеренные значения потоков)
-                VectorI = (double[])basicScheme.Flows.Clone(),
+                VectorI = Enumerable.Repeat(1.0, basicScheme.Flows.Length).ToArray(),
 
                 // Вектор X0 - начальные значения, тоже можно использовать Flows
                 VectorX0 = (double[])basicScheme.Flows.Clone(),
@@ -130,12 +130,34 @@ namespace QuadraticOptimizationApi.Converters
                 FlowRanges = new (RangeDto metrologicRange, RangeDto technologicRange)[basicScheme.Flows.Length]
             };
 
-            // Инициализируем интервальные ограничения (можно задать какие-то дефолтные значения)
             for (int i = 0; i < balanceDataModel.FlowRanges.Length; i++)
             {
                 balanceDataModel.FlowRanges[i] = (
-                    new RangeDto() { Max = 0, Min = 0 }, // метрологические ограничения (можно использовать допуски)
-                    new RangeDto() { Max = 0, Min = 0 } // технологические ограничения (нет информации в BasicScheme)
+                    new RangeDto() { Min = 0, Max = 0 },
+                    new RangeDto() { Min = -10000, Max = 10000 }
+                );
+            }
+
+            // Инициализируем интервальные ограничения (можно задать какие-то дефолтные значения)
+            for (int i = 0; i < origData.FlowRanges.Length; i++)
+            {
+                balanceDataModel.FlowRanges[i] = (
+                    origData.FlowRanges[i].metrologicRange, // метрологические ограничения (можно использовать допуски)
+                    origData.FlowRanges[i].technologicRange // технологические ограничения (нет информации в BasicScheme)
+                );
+            }
+
+            // Вычисляем технологические границы для добавленных потоков.
+            for (int i = 0; i < flowInds.Length; i++)
+            {
+                int origIndex = flowInds[i].origFlow;
+                int newIndex = flowInds[i].newFlow;
+                double min = origData.FlowRanges[origIndex].technologicRange.Min - origData.VectorX0[origIndex];
+                double max = origData.FlowRanges[origIndex].technologicRange.Max - origData.VectorX0[origIndex];
+
+                balanceDataModel.FlowRanges[newIndex] = (
+                    new RangeDto() { Min = 0, Max = 0 },
+                    new RangeDto() { Min = min, Max = max }
                 );
             }
 
